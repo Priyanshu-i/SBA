@@ -44,6 +44,7 @@ def run_full_turn(agent: Agent, messages: List[Dict]) -> Response:
             result = execute_tool_call(tool_call, tools, current_agent.name)
 
             if isinstance(result, Agent):
+                print(f"Handing off to {result.name}...")  # Debugging: Log the handoff
                 current_agent = result
                 result = f"Transferred to {current_agent.name}. Adopt persona immediately."
 

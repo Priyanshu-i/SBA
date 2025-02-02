@@ -14,15 +14,22 @@ def greet_user(name: str):
 def farewell_user(name: str):
     return f"Goodbye, {name}! Have a great day!"
 
+# Define a handoff tool to transfer from Agent 1 to Agent 2
+def transfer_to_farewell_agent():
+    """Transfer the conversation to the Farewell Agent."""
+    return agent2
+
 # Define Agent 1
 agent1 = Agent(
     name="Greeting Agent",
     instructions=(
         "You are a friendly agent. Greet the user and ask for their name. "
+        "If the user says 'Bye!' or indicates they want to end the conversation, "
+        "call the `transfer_to_farewell_agent` tool to hand off the conversation to the Farewell Agent. "
         "Always respond in a concise and professional manner. "
         "Do not include internal reasoning or tags like <think> in your responses."
     ),
-    tools=[greet_user],
+    tools=[transfer_to_farewell_agent],  # Add the handoff tool
 )
 # Define Agent 2
 agent2 = Agent(
@@ -35,12 +42,6 @@ agent2 = Agent(
     tools=[farewell_user],
 )
 
-# Define a handoff tool to transfer from Agent 1 to Agent 2
-def transfer_to_farewell_agent():
-    return agent2
-
-# Add the handoff tool to Agent 1
-agent1.tools.append(transfer_to_farewell_agent)
 
 # Initialize SBA with Agent 1
 sba = SBA(agent1)
@@ -52,7 +53,7 @@ print(f"User: {user_input}")
 
 # Agent 1 responds
 response = sba.interact(user_input)
-print(f"Assistant: {response}")
+
 
 # User provides their name
 user_input = "My name is Alice."
@@ -60,10 +61,9 @@ print(f"User: {user_input}")
 
 # Agent 1 responds and performs a handoff to Agent 2
 response = sba.interact(user_input)
-print(f"Assistant: {response}")
+
 
 # Agent 2 says goodbye
 user_input = "Bye!"
 print(f"User: {user_input}")
 response = sba.interact(user_input)
-print(f"Assistant: {response}")
